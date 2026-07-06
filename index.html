@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rekursion in PROLOG – Interaktive Aufgaben</title>
+<style>
+  :root{
+    --bg:#0f1320; --panel:#171d2e; --panel2:#1f2740; --line:#33406b;
+    --ink:#eaf0ff; --muted:#9aa8cf; --accent:#7aa2ff; --accent2:#59d3a4;
+    --amber:#e6b74a; --term:#0b0f1a; --code:#c9d6ff; --green:#7ee08a; --red:#e5736b;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; font-family:"Segoe UI",Roboto,Arial,sans-serif; color:var(--ink);
+    background:radial-gradient(1200px 600px at 50% -10%,#1b2340,var(--bg)); line-height:1.65}
+  header{text-align:center; padding:40px 16px 10px}
+  h1{margin:0; font-size:2.05rem; color:#fff; letter-spacing:.3px}
+  h1 .rec{color:var(--accent)}
+  .sub{color:var(--muted); margin-top:8px}
+  nav{position:sticky; top:0; z-index:10; background:rgba(15,19,32,.9); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line); display:flex; gap:6px; justify-content:center; flex-wrap:wrap; padding:10px}
+  nav a{color:var(--muted); text-decoration:none; padding:7px 14px; border-radius:8px; font-size:.9rem; font-weight:600}
+  nav a:hover{background:var(--panel2); color:var(--ink)}
+  .wrap{max-width:900px; margin:0 auto; padding:24px 16px 70px}
+  section{background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:26px;
+    margin:22px 0; box-shadow:0 12px 40px #0005}
+  h2{margin:0 0 4px; color:#fff; font-size:1.45rem}
+  .tag{display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.6px; text-transform:uppercase;
+    color:#08131f; background:var(--accent2); padding:3px 10px; border-radius:20px; margin-bottom:12px}
+  .tag.a{background:var(--accent)} .tag.t{background:var(--amber)}
+  p{margin:12px 0}
+  .lead{color:#dfe7ff}
+  pre{background:var(--term); border:1px solid var(--line); border-radius:12px; padding:16px 18px; overflow-x:auto;
+    font-family:Consolas,"Courier New",monospace; font-size:.87rem; color:var(--code); line-height:1.55; margin:14px 0}
+  pre .cm{color:#6f83b8; font-style:italic}
+  pre .kw{color:var(--amber)}
+  code.inl{background:#0c1220; border:1px solid var(--line); color:var(--code); padding:2px 6px; border-radius:5px;
+    font-family:Consolas,monospace; font-size:.86em}
+  details{background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:8px 14px; margin:14px 0}
+  summary{cursor:pointer; color:var(--accent); font-weight:600}
+  details pre{background:var(--term); margin-top:12px}
+  .callout{background:var(--panel2); border-left:4px solid var(--accent); border-radius:8px; padding:14px 18px; margin:16px 0}
+  .callout.rec{border-left-color:var(--accent2)}
+  .box-label{font-size:.8rem; font-weight:700; letter-spacing:.5px; text-transform:uppercase; color:var(--muted); margin:20px 0 8px}
+  textarea{width:100%; min-height:120px; background:#0c1220; border:1px solid var(--line); color:var(--ink);
+    border-radius:10px; padding:12px 14px; font-family:Consolas,"Courier New",monospace; font-size:.9rem; resize:vertical}
+  textarea:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 2px #7aa2ff33}
+  .hint{color:var(--muted); font-size:.85rem; margin-top:6px}
+  .revrow{display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap}
+  button.reveal{background:var(--accent); color:#08131f; border:none; padding:11px 20px; border-radius:9px;
+    font-weight:700; cursor:pointer; font-size:.95rem; transition:.15s}
+  button.reveal:hover:not(:disabled){filter:brightness(1.08)}
+  button.reveal:disabled{opacity:.4; cursor:not-allowed}
+  button.reveal.done{background:var(--accent2)}
+  .locknote{color:var(--muted); font-size:.85rem}
+  .solution{display:none; margin-top:20px; border-top:1px dashed var(--line); padding-top:20px; animation:fade .4s ease}
+  .solution.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .sol-title{color:var(--accent2); font-weight:700; margin-bottom:2px}
+  .trace{background:var(--term); border:1px solid var(--line); border-radius:12px; padding:16px 18px; overflow-x:auto;
+    font-family:Consolas,"Courier New",monospace; font-size:.85rem; line-height:1.7}
+  .trace .q{color:var(--amber)} .trace .ok{color:var(--green)} .trace .res{color:var(--accent)}
+  .trace .base{color:var(--accent2); font-weight:700}
+  .lvl1{padding-left:0} .lvl2{padding-left:26px} .lvl3{padding-left:52px} .lvl4{padding-left:78px}
+  .pill{display:inline-block; background:#0c1220; border:1px solid var(--line); border-radius:20px;
+    padding:3px 12px; margin:3px 6px 3px 0; font-size:.82rem; color:var(--muted)}
+  .pill b{color:var(--accent)}
+  footer{text-align:center; color:var(--muted); font-size:.84rem; padding:10px 16px 40px}
+  .note-src{background:#231b12; border:1px solid var(--amber); color:#f0e2c0; border-radius:10px;
+    padding:12px 16px; font-size:.88rem; margin:18px 0}
+  .treewrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--term); padding:10px}
+  .legend{display:flex; gap:20px; flex-wrap:wrap; margin-top:14px; color:var(--muted); font-size:.85rem; align-items:center}
+  .legend span{display:inline-flex; align-items:center; gap:8px}
+  .legend .sw{width:24px; border-top-width:3px; border-top-style:solid; display:inline-block}
+  .legend .swb{width:16px; height:16px; border-radius:4px; display:inline-block; border:1px solid}
+  svg#stammbaum .pc{stroke:#3d4a72; stroke-width:1.5; fill:none}
+  svg#stammbaum .cp{stroke:#c98f5a; stroke-width:2.5; fill:none}
+  svg#stammbaum .ex{stroke:var(--accent); stroke-width:4; fill:none; opacity:.9; stroke-linecap:round}
+  svg#stammbaum .node rect{fill:var(--panel2); stroke:var(--line); stroke-width:1.5}
+  svg#stammbaum .node text{fill:var(--ink); font-family:Consolas,monospace; font-size:13px; text-anchor:middle}
+  svg#stammbaum .exn rect{fill:#25406e; stroke:var(--accent); stroke-width:2.2}
+  svg#stammbaum .exn text{fill:#fff; font-weight:700}
+  svg#stammbaum .band{fill:#ffffff08}
+  svg#stammbaum .bandlbl{fill:#6f7fb0; font-size:11px; font-family:"Segoe UI",Arial}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="rec">&#8635;</span> Rekursion in PROLOG</h1>
+  <div class="sub">Interaktive Aufgaben aus dem Skript „Wissensbasierte Systeme" &middot; Informatik 13. Klasse</div>
+</header>
+
+<nav>
+  <a href="#intro">Grundlagen</a>
+  <a href="#kb">Wissensbasis</a>
+  <a href="#tree">Stammbaum</a>
+  <a href="#a1">Aufgabe 1: Vorfahre</a>
+  <a href="#a2">Aufgabe 2: Vorfahrgrad</a>
+  <a href="#a3">Aufgabe 3: Nachkomme</a>
+</nav>
+
+<div class="wrap">
+
+  <div class="note-src">
+    Hinweis: Diese Seite behandelt die Rekursions-Aufgaben des Skripts (Stammbaum / Verwandtschaft).
+    Jede Aufgabe zeigt die Musterlösung <b>erst, nachdem du deinen eigenen Lösungsversuch eingegeben hast</b>.
+  </div>
+
+  <!-- ===================== GRUNDLAGEN ===================== -->
+  <section id="intro">
+    <span class="tag">Grundlagen</span>
+    <h2>Was ist Rekursion in PROLOG?</h2>
+    <p class="lead">Eine <b>rekursive</b> Regel ist eine Regel, die sich in ihrem eigenen Rumpf wieder aufruft.
+    Damit lassen sich Beziehungen über <i>beliebig viele Zwischenschritte</i> ausdrücken – etwa „Vorfahre über
+    beliebig viele Generationen". Jede sinnvolle Rekursion besteht aus zwei Teilen:</p>
+
+    <div class="callout rec">
+      <b>1. Basisfall (Abbruch).</b> Der einfachste Fall, der <i>direkt</i> ohne weiteren Selbstaufruf wahr ist.
+      Er beendet die Rekursion.<br><br>
+      <b>2. Rekursionsschritt.</b> Führt das Problem über eine Zwischenperson auf einen <i>kleineren</i> Fall zurück
+      und ruft sich selbst damit erneut auf – eine Ebene „tiefer".
+    </div>
+
+    <p>Das typische Muster mit dem Faktum <code class="inl">elter/2</code> sieht so aus:</p>
+    <pre><span class="cm">% Basisfall: eine Ebene genügt</span>
+beziehung(X,Y) :- basis(X,Y).
+<span class="cm">% Rekursionsschritt: ueber Zwischenperson Z eine Ebene tiefer</span>
+beziehung(X,Y) :- basis(X,Z), beziehung(Z,Y).</pre>
+
+    <p><b>Warum terminiert das?</b> Weil jeder Schritt über <code class="inl">elter/2</code> eine echte Generation
+    nach unten geht und niemand sein eigener Vorfahre ist, wird die „Kette" mit jedem Aufruf kürzer. Irgendwann greift
+    der Basisfall – die Rekursion hält an und die Teilergebnisse „rollen" nach oben zurück.</p>
+  </section>
+
+  <!-- ===================== WISSENSBASIS ===================== -->
+  <section id="kb">
+    <span class="tag">Datenbasis</span>
+    <h2>Die Wissensbasis (Stammbaum)</h2>
+    <p>Alle Aufgaben nutzen dasselbe Faktum <code class="inl">elter(Elternteil, Kind)</code>. Für die Beispiele wichtig
+    ist die Kette <b>fritz &rarr; klaus &rarr; leo &rarr; alwin</b>.</p>
+    <details>
+      <summary>Alle <code class="inl">elter/2</code>-Fakten anzeigen</summary>
+<pre>elter(fritz,klaus).   elter(erna,klaus).
+elter(gunther,lore).  elter(gunther,marilies).
+elter(lollo,lore).    elter(lollo,marilies).
+elter(erich,arthur).  elter(ulla,arthur).
+elter(lorenz,barbara).elter(viktoria,barbara).
+elter(lorenz,bernd).  elter(viktoria,bernd).
+elter(michael,anita). elter(lina,anita).
+elter(klaus,leo).     elter(lore,leo).
+elter(arthur,elisa).  elter(barbara,elisa).
+elter(arthur,baldur). elter(barbara,baldur).
+elter(bernd,luc).     elter(anita,luc).
+elter(ida,alwin).     elter(leo,alwin).
+elter(leo,toni).      elter(leo,rob).
+elter(leo,lysa).      elter(leo,minna).
+elter(elisa,toni).    elter(elisa,rob).
+elter(elisa,lysa).    elter(elisa,minna).
+elter(baldur,john).   elter(baldur,anna).
+elter(irene,john).    elter(irene,anna).
+elter(luc,paul).      elter(luc,vreni).
+elter(lara,paul).     elter(lara,vreni).</pre>
+    </details>
+  </section>
+
+  <!-- ===================== STAMMBAUM ===================== -->
+  <section id="tree">
+    <span class="tag">Übersicht</span>
+    <h2>Stammbaum</h2>
+    <p>Der Stammbaum zeigt alle <code class="inl">elter/2</code>-Beziehungen auf einen Blick. <b style="color:#c98f5a">Waagerechte Linien</b>
+    sind Partnerschaften, die <b style="color:#8ea3d8">dünnen Linien nach unten</b> führen von den Eltern zu ihren Kindern. Die
+    <b style="color:var(--accent)">blau hervorgehobene Abstammung</b> <code class="inl">fritz &rarr; klaus &rarr; leo &rarr; alwin</code>
+    ist genau die Kette aus den Rekursions-Traces der Aufgaben.</p>
+    <div class="treewrap">
+      <svg id="stammbaum" viewBox="0 0 1290 500" width="1290" height="500" role="img" aria-label="Stammbaum der Wissensbasis"></svg>
+    </div>
+    <div class="legend">
+      <span><span class="sw" style="border-top-color:#c98f5a"></span>Partnerschaft</span>
+      <span><span class="sw" style="border-top-color:#3d4a72"></span>Eltern &rarr; Kind</span>
+      <span><span class="sw" style="border-top-color:#7aa2ff"></span>Beispiel-Abstammung</span>
+      <span><span class="swb" style="background:#25406e;border-color:#7aa2ff"></span>Person der Beispiellinie</span>
+    </div>
+    <p class="hint">Zeile 1 (oben) = älteste Generation, Zeile 4 (unten) = jüngste. Auf schmalen Bildschirmen horizontal scrollen.</p>
+    <script>
+    (function(){
+      const svg=document.getElementById('stammbaum');
+      const NS='http://www.w3.org/2000/svg';
+      function el(t,a){const e=document.createElementNS(NS,t);for(const k in (a||{}))e.setAttribute(k,a[k]);return e;}
+      // Personen: [name, cx, cy, istBeispiel?]
+      const nodes=[
+        ['fritz',136,70,1],['erna',256,70],['gunther',376,70],['lollo',496,70],['erich',616,70],
+        ['ulla',736,70],['lorenz',856,70],['viktoria',976,70],['michael',1096,70],['lina',1216,70],
+        ['klaus',246,195,1],['lore',366,195],['marilies',486,195],['arthur',646,195],['barbara',766,195],['bernd',946,195],['anita',1066,195],
+        ['elisa',226,320],['leo',366,320,1],['ida',566,320],['baldur',756,320],['irene',876,320],['luc',1036,320],['lara',1156,320],
+        ['toni',116,445],['rob',236,445],['lysa',356,445],['minna',476,445],['alwin',596,445,1],['john',756,445],['anna',876,445],['paul',1036,445],['vreni',1156,445]
+      ];
+      // Eltern->Kind: [mittelpunkt_x, unterkante_eltern_y, kind_cx, oberkante_kind_y]
+      const pc=[
+        [196,87,246,178],[436,87,366,178],[436,87,486,178],[676,87,646,178],[916,87,766,178],[916,87,946,178],[1156,87,1066,178],
+        [306,212,366,303],[706,212,226,303],[706,212,756,303],[1006,212,1036,303],
+        [296,337,116,428],[296,337,236,428],[296,337,356,428],[296,337,476,428],[466,337,596,428],
+        [816,337,756,428],[816,337,876,428],[1096,337,1036,428],[1096,337,1156,428]
+      ];
+      // Partnerschaften: [x1, x2, y]
+      const cp=[
+        [136,256,70],[376,496,70],[616,736,70],[856,976,70],[1096,1216,70],
+        [246,366,195],[646,766,195],[946,1066,195],
+        [226,366,320],[366,566,320],[756,876,320],[1036,1156,320]
+      ];
+      // Beispiel-Abstammung: [x1,y1,x2,y2]
+      const ex=[[136,70,246,195],[246,195,366,320],[366,320,596,445]];
+
+      [70,195,320,445].forEach((y,i)=>{
+        if(i%2===0) svg.appendChild(el('rect',{class:'band',x:0,y:y-24,width:1290,height:48}));
+        const t=el('text',{class:'bandlbl',x:8,y:y-8}); t.textContent='Gen '+(i+1); svg.appendChild(t);
+      });
+      pc.forEach(p=>svg.appendChild(el('line',{class:'pc',x1:p[0],y1:p[1],x2:p[2],y2:p[3]})));
+      cp.forEach(c=>svg.appendChild(el('line',{class:'cp',x1:c[0],y1:c[2],x2:c[1],y2:c[2]})));
+      ex.forEach(e=>svg.appendChild(el('line',{class:'ex',x1:e[0],y1:e[1],x2:e[2],y2:e[3]})));
+      nodes.forEach(n=>{
+        const g=el('g',{class:n[3]?'node exn':'node'});
+        g.appendChild(el('rect',{x:n[1]-48,y:n[2]-17,width:96,height:34,rx:8}));
+        const t=el('text',{x:n[1],y:n[2]+5}); t.textContent=n[0]; g.appendChild(t);
+        svg.appendChild(g);
+      });
+    })();
+    </script>
+  </section>
+
+  <!-- ===================== AUFGABE 1 ===================== -->
+  <section id="a1">
+    <span class="tag a">Aufgabe 1 &middot; Rekursion</span>
+    <h2>Vorfahre</h2>
+    <p class="lead">Definiere ein Prädikat <code class="inl">vorfahre(X,Y)</code>, das genau dann wahr ist, wenn X ein
+    <b>direkter oder weiter entfernter</b> Vorfahre von Y ist (Elternteil, Großelternteil, Urgroßelternteil, …).
+    Verwende nur das Faktum <code class="inl">elter/2</code>.</p>
+
+    <div class="box-label">Deine Lösung</div>
+    <textarea class="attempt" data-task="1" placeholder="vorfahre(X,Y) :- ...
+vorfahre(X,Y) :- ..."></textarea>
+    <div class="hint">Tipp: Du brauchst zwei Klauseln – einen Basisfall und einen Rekursionsschritt.</div>
+    <div class="revrow">
+      <button class="reveal" data-task="1" disabled>Lösung &amp; Erklärung anzeigen</button>
+      <span class="locknote" data-lock="1">Erst nach eigener Eingabe möglich</span>
+    </div>
+
+    <div class="solution" id="sol-1">
+      <div class="sol-title">Musterlösung</div>
+      <pre>vorfahre(X,Y) :- elter(X,Y).                 <span class="cm">% Basisfall</span>
+vorfahre(X,Y) :- elter(X,Z), vorfahre(Z,Y).  <span class="cm">% Rekursionsschritt</span></pre>
+
+      <p><b>Wie die Rekursion eingesetzt wird.</b> Die erste Klausel ist der <b>Basisfall</b>: X ist Vorfahre von Y,
+      wenn X <i>direkt</i> Elternteil von Y ist – hier ruft sich nichts erneut auf. Die zweite Klausel ist der
+      <b>Rekursionsschritt</b>: X ist Vorfahre von Y, wenn X Elternteil einer Zwischenperson <code class="inl">Z</code>
+      ist und diese Zwischenperson ihrerseits Vorfahre von Y ist. Der Aufruf <code class="inl">vorfahre(Z,Y)</code>
+      im Rumpf ist der rekursive Aufruf – er wandert eine Generation tiefer, bis der Basisfall greift.</p>
+
+      <div class="box-label">Ablauf (Trace) für <code class="inl">vorfahre(fritz, alwin)</code></div>
+      <div class="trace">
+<span class="q">?- vorfahre(fritz, alwin).</span>
+<div class="lvl1">Regel 2: <span class="ok">elter(fritz, klaus) &#10003;</span> &rarr; rufe vorfahre(klaus, alwin)</div>
+<div class="lvl2">Regel 2: <span class="ok">elter(klaus, leo) &#10003;</span> &rarr; rufe vorfahre(leo, alwin)</div>
+<div class="lvl3">Regel 1: <span class="ok">elter(leo, alwin) &#10003;</span> &rarr; <span class="base">Basisfall erreicht – wahr!</span></div>
+<div class="lvl2">&#8658; wahr</div>
+<div class="lvl1">&#8658; wahr</div>
+<span class="res">true.</span>
+      </div>
+      <p>Man sieht die drei Ebenen der Rekursion (fritz&rarr;klaus&rarr;leo&rarr;alwin). Sobald der Basisfall
+      <code class="inl">elter(leo,alwin)</code> wahr ist, „rollt" das Ergebnis Schritt für Schritt nach oben zurück –
+      jede Ebene ist wahr, weil die darunterliegende wahr ist.</p>
+      <div class="callout">Mit <code class="inl">?- vorfahre(X, alwin).</code> liefert dieselbe Regel per Backtracking
+      <i>alle</i> Ahnen von alwin: ida &amp; leo (Eltern), klaus &amp; lore (Großeltern), fritz, erna, gunther, lollo
+      (Urgroßeltern) usw.</p>
+    </div>
+  </section>
+
+  <!-- ===================== AUFGABE 2 ===================== -->
+  <section id="a2">
+    <span class="tag a">Aufgabe 2 &middot; Rekursion mit Zähler</span>
+    <h2>Vorfahrgrad</h2>
+    <p class="lead">Erweitere die Vorfahren-Rekursion so, dass zusätzlich der <b>Grad</b> ausgegeben wird – also die
+    <b>Anzahl der Generationen</b> zwischen X und Y: <code class="inl">vorfahrgrad(X,Y,Grad)</code>. Ein Elternteil hat
+    Grad 1, ein Großelternteil Grad 2, ein Urgroßelternteil Grad 3 usw.</p>
+
+    <div class="box-label">Deine Lösung</div>
+    <textarea class="attempt" data-task="2" placeholder="vorfahrgrad(X,Y,1) :- ...
+vorfahrgrad(X,Y,G) :- ..."></textarea>
+    <div class="hint">Tipp: Der Basisfall hat den Grad 1. Im Rekursionsschritt musst du beim „Zurückrollen" 1 dazuzählen (<code class="inl">is</code>).</div>
+    <div class="revrow">
+      <button class="reveal" data-task="2" disabled>Lösung &amp; Erklärung anzeigen</button>
+      <span class="locknote" data-lock="2">Erst nach eigener Eingabe möglich</span>
+    </div>
+
+    <div class="solution" id="sol-2">
+      <div class="sol-title">Musterlösung</div>
+      <pre>vorfahrgrad(X,Y,1) :- elter(X,Y).                        <span class="cm">% Basisfall: Grad 1</span>
+vorfahrgrad(X,Y,G) :- elter(X,Z), vorfahrgrad(Z,Y,G1), G is G1+1.</pre>
+
+      <p><b>Wie die Rekursion eingesetzt wird.</b> Die Struktur ist dieselbe wie bei <code class="inl">vorfahre</code>,
+      nur trägt jede Klausel einen <b>Zähler</b>. Der Basisfall setzt den Grad direkt auf <code class="inl">1</code>
+      (eine Generation). Im Rekursionsschritt wird zuerst der rekursive Aufruf <code class="inl">vorfahrgrad(Z,Y,G1)</code>
+      ausgeführt – er liefert den Grad <i>von Z aus gesehen</i>. Weil X eine Generation <b>über</b> Z steht, ist Xs Grad
+      um eins größer: <code class="inl">G is G1+1</code>.</p>
+
+      <div class="callout rec"><b>Wichtig – die Reihenfolge!</b> <code class="inl">G is G1+1</code> steht bewusst
+      <i>nach</i> dem rekursiven Aufruf. <code class="inl">is</code> rechnet nur, wenn die rechte Seite vollständig
+      bekannt ist. <code class="inl">G1</code> wird erst durch die Rekursion gebunden – deshalb wird der Grad beim
+      „Zurückrollen" Schritt für Schritt aufaddiert.</p>
+
+      <div class="box-label">Ablauf (Trace) für <code class="inl">vorfahrgrad(fritz, alwin, G)</code></div>
+      <div class="trace">
+<span class="q">?- vorfahrgrad(fritz, alwin, G).</span>
+<div class="lvl1"><span class="ok">elter(fritz,klaus) &#10003;</span> &rarr; vorfahrgrad(klaus,alwin,G1), danach G is G1+1</div>
+<div class="lvl2"><span class="ok">elter(klaus,leo) &#10003;</span> &rarr; vorfahrgrad(leo,alwin,G2), danach G1 is G2+1</div>
+<div class="lvl3"><span class="ok">elter(leo,alwin) &#10003;</span> &rarr; <span class="base">Basisfall: G2 = 1</span></div>
+<div class="lvl2">&#8658; G1 = 1 + 1 = <b>2</b></div>
+<div class="lvl1">&#8658; G = 2 + 1 = <b>3</b></div>
+<span class="res">G = 3.</span>
+      </div>
+      <p>fritz ist also Vorfahre 3. Grades von alwin (Urgroßvater). Der Zähler wird genau dann erhöht, wenn die
+      Rekursion sich „auflöst" – von unten (Grad 1) nach oben (Grad 3).</p>
+      <div class="callout">Man kann den Grad auch vorgeben: <code class="inl">?- vorfahrgrad(X, alwin, 2).</code>
+      findet gezielt alle <b>Großeltern</b> von alwin (klaus, lore).</div>
+    </div>
+  </section>
+
+  <!-- ===================== AUFGABE 3 ===================== -->
+  <section id="a3">
+    <span class="tag t">Aufgabe 3 &middot; Transfer</span>
+    <h2>Nachkomme</h2>
+    <p class="lead">Übertrage das Rekursionsmuster in die <b>andere Richtung</b>: Definiere
+    <code class="inl">nachkomme(X,Y)</code>, das wahr ist, wenn X ein Nachkomme (Kind, Enkel, Urenkel, …) von Y ist.</p>
+
+    <div class="box-label">Deine Lösung</div>
+    <textarea class="attempt" data-task="3" placeholder="nachkomme(X,Y) :- ...
+nachkomme(X,Y) :- ..."></textarea>
+    <div class="hint">Tipp: Dieselbe Idee wie bei <code class="inl">vorfahre</code> – nur sind bei <code class="inl">elter</code> jetzt die Rollen von X und Y vertauscht.</div>
+    <div class="revrow">
+      <button class="reveal" data-task="3" disabled>Lösung &amp; Erklärung anzeigen</button>
+      <span class="locknote" data-lock="3">Erst nach eigener Eingabe möglich</span>
+    </div>
+
+    <div class="solution" id="sol-3">
+      <div class="sol-title">Musterlösung</div>
+      <pre>nachkomme(X,Y) :- elter(Y,X).                 <span class="cm">% Basisfall: X ist Kind von Y</span>
+nachkomme(X,Y) :- elter(Y,Z), nachkomme(X,Z). <span class="cm">% Rekursionsschritt</span></pre>
+
+      <p><b>Wie die Rekursion eingesetzt wird.</b> Der Basisfall <code class="inl">elter(Y,X)</code> ist einfach die
+      Umkehrung von „Elternteil": X ist Kind (also direkter Nachkomme) von Y. Im Rekursionsschritt sucht
+      <code class="inl">elter(Y,Z)</code> ein Kind Z von Y, und der rekursive Aufruf
+      <code class="inl">nachkomme(X,Z)</code> prüft, ob X ein Nachkomme dieses Kindes ist – so steigt die Rekursion den
+      Stammbaum <i>hinab</i>, statt hinauf.</p>
+
+      <div class="callout rec"><b>Noch kürzer.</b> Weil „Nachkomme" genau das Gegenteil von „Vorfahre" ist, kann man
+      auch auf Aufgabe 1 aufbauen: <code class="inl">nachkomme(X,Y) :- vorfahre(Y,X).</code> Hier steckt die Rekursion
+      dann in <code class="inl">vorfahre</code>.</p>
+
+      <div class="box-label">Ablauf (Trace) für <code class="inl">nachkomme(alwin, fritz)</code></div>
+      <div class="trace">
+<span class="q">?- nachkomme(alwin, fritz).</span>
+<div class="lvl1">Regel 2: <span class="ok">elter(fritz, klaus) &#10003;</span> &rarr; rufe nachkomme(alwin, klaus)</div>
+<div class="lvl2">Regel 2: <span class="ok">elter(klaus, leo) &#10003;</span> &rarr; rufe nachkomme(alwin, leo)</div>
+<div class="lvl3">Regel 1: <span class="ok">elter(leo, alwin) &#10003;</span> &rarr; <span class="base">Basisfall erreicht – wahr!</span></div>
+<div class="lvl2">&#8658; wahr</div>
+<div class="lvl1">&#8658; wahr</div>
+<span class="res">true.</span>
+      </div>
+      <p>Dieselbe dreistufige Kette wie bei Aufgabe 1 – nur „von oben nach unten" gelesen.</p>
+    </div>
+  </section>
+
+  <div class="callout" style="margin-top:26px">
+    <b>Das gemeinsame Muster.</b>
+    <span class="pill"><b>Basisfall</b> &rarr; hält die Rekursion an</span>
+    <span class="pill"><b>Rekursionsschritt</b> &rarr; eine Ebene tiefer via Zwischenperson Z</span>
+    <span class="pill"><b>Terminierung</b> &rarr; endliche Elternkette</span>
+    Alle drei Aufgaben nutzen exakt dieses Muster – bei <code class="inl">vorfahrgrad</code> zusätzlich mit einem
+    mitgezählten Grad.
+  </div>
+
+</div>
+
+<footer>Interaktives Lernmaterial &middot; Informatik 13. Klasse &middot; Wissensbasierte Systeme &middot; Thema Rekursion</footer>
+
+<script>
+// Lösung erst nach eigener Eingabe freischalten
+document.querySelectorAll('.attempt').forEach(ta=>{
+  const id = ta.dataset.task;
+  const btn = document.querySelector('.reveal[data-task="'+id+'"]');
+  const lock = document.querySelector('[data-lock="'+id+'"]');
+  ta.addEventListener('input',()=>{
+    const ok = ta.value.trim().length >= 12;
+    btn.disabled = !ok;
+    if(lock) lock.textContent = ok ? 'Du kannst deine Lösung jetzt vergleichen' : 'Erst nach eigener Eingabe möglich';
+  });
+});
+document.querySelectorAll('.reveal').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(btn.disabled) return;
+    const id = btn.dataset.task;
+    document.getElementById('sol-'+id).classList.add('show');
+    btn.textContent = 'Lösung angezeigt ✓';
+    btn.classList.add('done');
+    const lock = document.querySelector('[data-lock="'+id+'"]');
+    if(lock) lock.textContent = '';
+  });
+});
+</script>
+</body>
+</html>
